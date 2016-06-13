@@ -857,16 +857,25 @@ abstract class AbstractSchemaManager
             $keyName = strtolower($keyName);
 
             if (!isset($result[$keyName])) {
+                $options = array(
+                    'lengths' => array(isset($tableIndex['sub_part']) ? $tableIndex['sub_part'] : null),
+                );
+
+                if (isset($tableIndex['where'])) {
+                    $options['where'] = $tableIndex['where'];
+                }
+
                 $result[$keyName] = array(
                     'name' => $indexName,
                     'columns' => array($tableIndex['column_name']),
                     'unique' => $tableIndex['non_unique'] ? false : true,
                     'primary' => $tableIndex['primary'],
                     'flags' => isset($tableIndex['flags']) ? $tableIndex['flags'] : array(),
-                    'options' => isset($tableIndex['where']) ? array('where' => $tableIndex['where']) : array(),
+                    'options' => $options,
                 );
             } else {
                 $result[$keyName]['columns'][] = $tableIndex['column_name'];
+                $result[$keyName]['options']['lengths'][] = isset($tableIndex['sub_part']) ? $tableIndex['sub_part'] : null;
             }
         }
 

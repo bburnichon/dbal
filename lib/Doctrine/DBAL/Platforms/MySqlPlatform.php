@@ -646,7 +646,7 @@ class MySqlPlatform extends AbstractPlatform
 
                     $query = 'ALTER TABLE ' . $table . ' DROP INDEX ' . $remIndex->getName() . ', ';
                     $query .= 'ADD ' . $indexClause;
-                    $query .= ' (' . $this->getIndexFieldDeclarationListSQL($addIndex->getQuotedColumns($this)) . ')';
+                    $query .= ' (' . $this->getIndexFieldDeclarationListSQL($addIndex) . ')';
 
                     $sql[] = $query;
 
@@ -702,7 +702,7 @@ class MySqlPlatform extends AbstractPlatform
             if (! $diff->fromTable->hasColumn($columnName)) {
                 continue;
             }
-          
+
             $column = $diff->fromTable->getColumn($columnName);
 
             if ($column->getAutoincrement() === true) {
@@ -1093,5 +1093,28 @@ class MySqlPlatform extends AbstractPlatform
         $str = str_replace('\\', '\\\\', $str); // MySQL requires backslashes to be escaped aswell.
 
         return parent::quoteStringLiteral($str);
+    }
+
+    public function getIndexFieldDeclarationListSQL($fields)
+    {
+        if ($fields instanceof Index) {
+            $subParts = $fields->hasOption('lengths') ? $fields->getOption('lengths') : array();
+
+            $ret = array();
+
+            foreach ($fields->getQuotedColumns($this) as $quotedColumn) {
+                $length = array_shift($subParts);
+
+                if (null !== $length) {
+                    $quotedColumn .= '(' . $length . ')';
+                }
+
+                $ret[] = $quotedColumn;
+            }
+
+            return implode(', ', $ret);
+        }
+
+        return parent::getIndexFieldDeclarationListSQL($fields);
     }
 }

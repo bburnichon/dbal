@@ -1750,7 +1750,7 @@ abstract class AbstractPlatform
             $table = $table->getQuotedName($this);
         }
         $name = $index->getQuotedName($this);
-        $columns = $index->getQuotedColumns($this);
+        $columns = $index->getColumns();
 
         if (count($columns) == 0) {
             throw new \InvalidArgumentException("Incomplete definition. 'columns' required.");
@@ -1761,7 +1761,7 @@ abstract class AbstractPlatform
         }
 
         $query = 'CREATE ' . $this->getCreateIndexSQLFlags($index) . 'INDEX ' . $name . ' ON ' . $table;
-        $query .= ' (' . $this->getIndexFieldDeclarationListSQL($columns) . ')' . $this->getPartialIndexSQL($index);
+        $query .= ' (' . $this->getIndexFieldDeclarationListSQL($index) . ')' . $this->getPartialIndexSQL($index);
 
         return $query;
     }
@@ -1804,7 +1804,7 @@ abstract class AbstractPlatform
      */
     public function getCreatePrimaryKeySQL(Index $index, $table)
     {
-        return 'ALTER TABLE ' . $table . ' ADD PRIMARY KEY (' . $this->getIndexFieldDeclarationListSQL($index->getQuotedColumns($this)) . ')';
+        return 'ALTER TABLE ' . $table . ' ADD PRIMARY KEY (' . $this->getIndexFieldDeclarationListSQL($index) . ')';
     }
 
     /**
@@ -2313,7 +2313,7 @@ abstract class AbstractPlatform
      */
     public function getUniqueConstraintDeclarationSQL($name, Index $index)
     {
-        $columns = $index->getQuotedColumns($this);
+        $columns = $index->getColumns();
         $name = new Identifier($name);
 
         if (count($columns) === 0) {
@@ -2321,7 +2321,7 @@ abstract class AbstractPlatform
         }
 
         return 'CONSTRAINT ' . $name->getQuotedName($this) . ' UNIQUE ('
-             . $this->getIndexFieldDeclarationListSQL($columns)
+             . $this->getIndexFieldDeclarationListSQL($index)
              . ')' . $this->getPartialIndexSQL($index);
     }
 
@@ -2338,7 +2338,7 @@ abstract class AbstractPlatform
      */
     public function getIndexDeclarationSQL($name, Index $index)
     {
-        $columns = $index->getQuotedColumns($this);
+        $columns = $index->getColumns();
         $name = new Identifier($name);
 
         if (count($columns) === 0) {
@@ -2346,7 +2346,7 @@ abstract class AbstractPlatform
         }
 
         return $this->getCreateIndexSQLFlags($index) . 'INDEX ' . $name->getQuotedName($this) . ' ('
-            . $this->getIndexFieldDeclarationListSQL($columns)
+            . $this->getIndexFieldDeclarationListSQL($index)
             . ')' . $this->getPartialIndexSQL($index);
     }
 
@@ -2368,12 +2368,18 @@ abstract class AbstractPlatform
      * Obtains DBMS specific SQL code portion needed to set an index
      * declaration to be used in statements like CREATE TABLE.
      *
-     * @param array $fields
+     * @param array|Index $fields
      *
      * @return string
      */
-    public function getIndexFieldDeclarationListSQL(array $fields)
+    public function getIndexFieldDeclarationListSQL($fields)
     {
+        if ($fields instanceof Index) {
+            return implode(', ', $fields->getQuotedColumns($this));
+        } elseif (!is_array($fields)) {
+            throw new \InvalidArgumentException('Fields argument should be an Index or an array.');
+        }
+
         $ret = array();
 
         foreach ($fields as $field => $definition) {
