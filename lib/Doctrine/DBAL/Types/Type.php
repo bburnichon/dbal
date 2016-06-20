@@ -46,6 +46,7 @@ abstract class Type
     const INTEGER = 'integer';
     const OBJECT = 'object';
     const SMALLINT = 'smallint';
+    const TINYINT = 'tinyint';
     const STRING = 'string';
     const TEXT = 'text';
     const BINARY = 'binary';
@@ -73,6 +74,7 @@ abstract class Type
         self::BOOLEAN => 'Doctrine\DBAL\Types\BooleanType',
         self::INTEGER => 'Doctrine\DBAL\Types\IntegerType',
         self::SMALLINT => 'Doctrine\DBAL\Types\SmallIntType',
+        self::TINYINT => 'Doctrine\DBAL\Types\TinyIntType',
         self::BIGINT => 'Doctrine\DBAL\Types\BigIntType',
         self::STRING => 'Doctrine\DBAL\Types\StringType',
         self::TEXT => 'Doctrine\DBAL\Types\TextType',

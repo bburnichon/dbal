@@ -883,6 +883,11 @@ class MySqlPlatform extends AbstractPlatform
         return 'SMALLINT' . $this->_getCommonIntegerTypeDeclarationSQL($field);
     }
 
+    public function getTinyIntTypeDeclarationSQL(array $field)
+    {
+        return 'TINYINT' . $this->_getCommonIntegerTypeDeclarationSQL($field);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -979,7 +984,7 @@ class MySqlPlatform extends AbstractPlatform
     protected function initializeDoctrineTypeMappings()
     {
         $this->doctrineTypeMapping = array(
-            'tinyint'       => 'boolean',
+            'tinyint'       => 'tinyint',
             'smallint'      => 'smallint',
             'mediumint'     => 'integer',
             'int'           => 'integer',

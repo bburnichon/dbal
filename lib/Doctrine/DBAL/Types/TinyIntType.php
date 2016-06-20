@@ -22,26 +22,26 @@ namespace Doctrine\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * Type that maps an SQL boolean to a PHP boolean.
+ * Type that maps a database TINYINT to a PHP integer.
  *
- * @since 2.0
+ * @author robo
  */
-class BooleanType extends Type
+class TinyIntType extends Type
 {
     /**
      * {@inheritdoc}
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getName()
     {
-        return $platform->getBooleanTypeDeclarationSQL($fieldDeclaration);
+        return Type::TINYINT;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return $platform->convertBooleansToDatabaseValue($value);
+        return $platform->getTinyIntTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
@@ -49,15 +49,7 @@ class BooleanType extends Type
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return $platform->convertFromBoolean($value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return Type::BOOLEAN;
+        return (null === $value) ? null : (int) $value;
     }
 
     /**
@@ -65,11 +57,6 @@ class BooleanType extends Type
      */
     public function getBindingType()
     {
-        return \PDO::PARAM_BOOL;
-    }
-
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
-    {
-        return true;
+        return \PDO::PARAM_INT;
     }
 }
