@@ -362,6 +362,21 @@ class MySqlPlatform extends AbstractPlatform
     }
 
     /**
+     * @param string
+     * @param string|null $database
+     * @return string
+     */
+    public function getTableOptionsSQL($table, $database = null)
+    {
+        $database = $database ? "'". $database . "'" : 'DATABASE()';
+
+        return "SELECT ENGINE as engine, TABLE_COLLATION as collation, ".
+               "CREATE_OPTIONS as create_options, TABLE_COMMENT as comment ".
+               "FROM information_schema.TABLES WHERE TABLE_SCHEMA = " . $database . " AND TABLE_NAME = '".
+               $table . "' AND TABLE_TYPE='BASE TABLE'";
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getListTableColumnsSQL($table, $database = null)

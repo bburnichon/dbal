@@ -285,7 +285,10 @@ abstract class AbstractSchemaManager
         }
         $indexes = $this->listTableIndexes($tableName);
 
-        return new Table($tableName, $columns, $indexes, $foreignKeys, false, array());
+        $sql = $this->_platform->getTableOptionsSQL($tableName);
+        $options = $this->_conn->fetchAssoc($sql);
+
+        return new Table($tableName, $columns, $indexes, $foreignKeys, false, $options);
     }
 
     /**
