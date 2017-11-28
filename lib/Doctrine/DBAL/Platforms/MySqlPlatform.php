@@ -279,6 +279,15 @@ class MySqlPlatform extends AbstractPlatform
         return 'DATETIME';
     }
 
+    public function getFloatDeclarationSQL(array $fieldDeclaration)
+    {
+        if (isset($fieldDeclaration['unsigned']) && $fieldDeclaration['unsigned']) {
+            return parent::getFloatDeclarationSQL($fieldDeclaration) . ' UNSIGNED';
+        }
+
+        return parent::getFloatDeclarationSQL($fieldDeclaration);
+    }
+
     /**
      * {@inheritDoc}
      */
