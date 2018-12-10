@@ -531,4 +531,26 @@ SQL;
         self::assertEquals('', $onlineTable->getOption('comment'));
         self::assertEquals([], $onlineTable->getOption('create_options'));
     }
+
+    public function testEnsureTableOptionsSupportPartitionedTables() : void
+    {
+        $this->connection->query('DROP TABLE IF EXISTS test_table_partitioned');
+
+        $sql = <<<'SQL'
+CREATE TABLE test_table_partitioned (
+  col1 INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+)
+COLLATE=utf8mb4_unicode_ci
+ENGINE=InnoDB
+PARTITION BY RANGE (col1) (
+ PARTITION p1 VALUES LESS THAN (2) ENGINE = InnoDB,
+ PARTITION pMax VALUES LESS THAN MAXVALUE
+)
+SQL;
+
+        $this->connection->query($sql);
+        $onlineTable = $this->schemaManager->listTableDetails('test_table_partitioned');
+
+        self::assertEquals(['partitioned' => true], $onlineTable->getOption('create_options'));
+    }
 }

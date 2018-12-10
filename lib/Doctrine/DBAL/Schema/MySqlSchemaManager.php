@@ -321,6 +321,11 @@ class MySqlSchemaManager extends AbstractSchemaManager
         }
 
         foreach (explode(' ', $string) as $pair) {
+            if (strpos($pair, '=') === false) {
+                $options[$pair] = true;
+
+                continue;
+            }
             $parts = explode('=', $pair, 2);
 
             $options[$parts[0]] = $parts[1] ?? true;
